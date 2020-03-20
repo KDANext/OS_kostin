@@ -1,10 +1,10 @@
 package Os2;
 
 public class Flow {
-	String Name;
-	MyInt CurrentTime;
-	int NeedTime;
-	boolean Done = false;
+	private String Name;
+	private MyInt CurrentTime;
+	private int NeedTime;
+	private boolean Done = false;
 	public Flow(String Name, MyInt CurrentTime ,int NeedTime) {
 		this.Name = "Flow name: "+Name;
 		this.CurrentTime =CurrentTime;

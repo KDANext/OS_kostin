@@ -2,7 +2,7 @@ package Os2;
 
 public class MyInt {
 
-	int value = 0;
+	private int value = 0;
 	public String toString() {
 		return value + "";
 	}

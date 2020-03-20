@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Core {
-	ArrayDeque<Process> processes = new ArrayDeque<Process>();
-	int WorkTime = 3;
+	private ArrayDeque<Process> processes = new ArrayDeque<Process>();
+	private int WorkTime = 3;
 	public Core() {
 		Random rnd = new Random();
 		for (int i = 0; i < 2; i++) {
@@ -19,7 +19,7 @@ public class Core {
 		}
 	}
 	public void Work() {
-		for (int i = 0; i < 25; i++) {
+		while(true) {
 			Process process = processes.poll();
 			process.Start();
 			if(!process.ProcessDone()) {

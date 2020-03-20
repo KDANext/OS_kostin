@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Process {
-	String Name;
-	MyInt CurrentTime=new MyInt();
-	ArrayList<Flow> flows;
-	int Time;
+	private String Name;
+	private MyInt CurrentTime=new MyInt();
+	private ArrayList<Flow> flows;
+	private int Time;
 	public Process(String Name,int Time) {
 		this.Time = Time;
 		this.Name ="Procces name: "+Name;
