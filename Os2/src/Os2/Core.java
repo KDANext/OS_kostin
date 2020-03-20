@@ -6,11 +6,14 @@ import java.util.Random;
 
 public class Core {
 	private ArrayDeque<Process> processes = new ArrayDeque<Process>();
+	private ArrayDeque<Flow> flows = new ArrayDeque<Flow>();
 	private int WorkTime = 3;
 	public Core() {
 		Random rnd = new Random();
 		for (int i = 0; i < rnd.nextInt(5)+1; i++) {
-			processes.add(new Process(i+" ",WorkTime));
+			Process process = new Process(i+" ",WorkTime);
+			processes.offer(process);
+			flows.addAll(process.getFlows());
 		}
 	}
 	public void PrintAllFlow() {
@@ -19,18 +22,13 @@ public class Core {
 		}
 	}
 	public void Work() {
-		while(true) {
-			Process process = processes.poll();
-			process.Start();
-			if(!process.ProcessDone()) {
-				processes.offer(process);
-				System.out.println(process.GetName() + " " + "process need more time");
-			}
-			else {
-				System.out.println(process.GetName() + " " + "process done");
-			}
-			if(processes.isEmpty()) {
-				break;
+		for (int i = 0; i < 25; i++) {
+			if (flows.isEmpty()) break;
+			Flow flow = flows.poll();
+			if(flow.MaybeWork(WorkTime)) {
+				flow.DoIt();
+			} else {
+				flow.ErrorTime();
 			}
 		}
 	}

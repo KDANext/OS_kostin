@@ -1,6 +1,7 @@
 package Os2;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Random;
 
 public class Process {
@@ -34,9 +35,6 @@ public class Process {
 			if(flows.get(i).MaybeWork(Time - CurrentTime.getValue())) {
 				flows.get(i).DoIt();
 			}
-			if(flows.get(i).ErrorTime(Time)) {
-				
-			}
 			else {
 				continue;
 			}
@@ -52,5 +50,8 @@ public class Process {
 	}
 	public String GetName() {
 		return Name;
+	}
+	public Collection<? extends Flow> getFlows() {
+		return flows;
 	}
 }

@@ -32,12 +32,8 @@ public class Flow {
 		Done = true;
 		return Name + "end with error";
 	}
-	public boolean ErrorTime(int time) {
-		if(time < NeedTime) {
-			Done = true;
+	public void ErrorTime() {
 			System.out.println(Name + "not enough Core time");
-			return true;
-		}
-		return false;
+			
 	}
 }
