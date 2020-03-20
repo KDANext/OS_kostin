@@ -9,7 +9,7 @@ public class Core {
 	private int WorkTime = 3;
 	public Core() {
 		Random rnd = new Random();
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < rnd.nextInt(5)+1; i++) {
 			processes.add(new Process(i+" ",WorkTime));
 		}
 	}
