@@ -1,47 +1,27 @@
 package lab5OS;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class MemoryPage {
-	private int[] memory;
 	private Boolean signOfAppeal=true;
+	private int startListX;
+	private int startListY;
+	private int size;
+	private Memory memorys;
 	
-	public MemoryPage(int sizePage) {
-		memory = new int[sizePage];
-		randomPage(100000);
-	}
-	
-	public int getInformation(int i) {
-		return memory[i];
-	}
-	
-	public boolean setInformation(int i,int information) {
-		if(memory[i]==-1) {
-			memory[i]=information;
-			return true;
-		} 
-		return false;
-	}
-	
-	private void newPage() {
-		for (int i = 0; i < memory.length; i++) {
-			memory[i]=-1;
-		}
-	}
-	
-	private int emptyIndex() {
-		for (int i = 0; i < memory.length; i++) {
-			if(memory[i]==-1) {
-				return i;
-			}
-		}
-		return -1;
-	}
+	public MemoryPage(Memory memorys, int indexX, int indexY) {
+		startListX = indexX;
+		startListY = indexY;
+		size = memorys.getSizePage();
+		this.memorys = memorys;
+		clear();
+	}	
 	
 	public void randomPage(int r) {
 		Random rnd = new Random();
-		for (int i = 0; i < memory.length; i++) {
-			memory[i] = rnd.nextInt(r);
+		for (int i = 0; i < size; i++) {
+			memorys.setInformation(startListX, startListY+i, rnd.nextInt(r-1)+1);
 		}
 	}
 
@@ -53,7 +33,18 @@ public class MemoryPage {
 		this.signOfAppeal = signOfAppeal;
 	}
 	
-	public int[] getMemory() {
-		return memory;
+	public int[] getInformationOnPage() {
+		int[] array = new int[size];
+		for (int i = 0; i < size; i++) {
+			array[i] = memorys.getInformation(startListX, startListY+i);
+		}
+		return array;
+	}
+
+	public void clear() {
+		for (int i = 0; i < size; i++) {
+			memorys.setInformation(startListX, startListY+i,-1);
+		}
+		
 	}
 }

@@ -3,26 +3,23 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Manager {
-	
 	private ArrayList<MemoryPage> listMemory;
-	private ArrayList<MemoryPage> outLoadPage = new ArrayList<MemoryPage>();
+	private ArrayList<int[]> outLoadPage = new ArrayList<int[]>();
 	private int Rand = 100000;
 	private int sizePage;
-	
-	public Manager(int sizeMemory,int sizePage) {
-		listMemory= new ArrayList<MemoryPage>();
-		this.sizePage = sizePage;
-		int tempCountPage = sizeMemory/sizePage;
-		System.out.println(tempCountPage);
-		for (int i = 0; i < tempCountPage; i++) {
-			listMemory.add(new MemoryPage(sizePage));
-		}
+
+	public Manager(Memory memory) {
+		int[] temp = memory.getIndexForNewPage();
+		listMemory = new ArrayList<MemoryPage>();
+		do {		
+			listMemory.add(new MemoryPage(memory,temp[0],temp[1]));
+			temp = memory.getIndexForNewPage();
+		} while (temp!=null);
 		ramdomPages();
 	}
 	public void outLoad(int i) {
-		outLoadPage.add(listMemory.get(i));
-		listMemory.remove(i);
-		listMemory.add(i, new MemoryPage(sizePage));
+		outLoadPage.add(listMemory.get(i).getInformationOnPage());
+		listMemory.get(i).randomPage(Rand);;
 	}
 
 	private void ramdomPages() {
@@ -52,12 +49,20 @@ public class Manager {
 		System.out.println("mainMemory:");
 		printPages(listMemory);
 		System.out.println("outLoadMemory:");
-		printPages(outLoadPage);
+		printPagesOut(outLoadPage);
 	}
 	
+	private void printPagesOut(ArrayList<int[]> list) {
+		for (int[] is : list) {
+			for (int i : is) {
+				System.out.printf("%7d",i);
+			}
+			System.out.println();
+		}		
+	}
 	private void printPages(ArrayList<MemoryPage> list) {
 		for (MemoryPage memoryPage : list) {
-			for (int i : memoryPage.getMemory()) {
+			for (int i : memoryPage.getInformationOnPage()) {
 				System.out.printf("%7d",i);
 			}
 			System.out.println();
