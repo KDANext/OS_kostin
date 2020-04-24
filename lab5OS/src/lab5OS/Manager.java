@@ -3,39 +3,52 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Manager {
-	private ArrayList<MemoryPage> listMemory;
+	private ArrayList<memPage> listMemory;
 	private ArrayList<int[]> outLoadPage = new ArrayList<int[]>();
 	private int Rand = 100000;
-	private int sizePage;
+	private Memory memory;
+	Random rnd = new Random();
 
 	public Manager(Memory memory) {
-		int[] temp = memory.getIndexForNewPage();
-		listMemory = new ArrayList<MemoryPage>();
+		this.memory = memory;
+		memPage temp = memory.getIndexForNewPage();
+		listMemory = new ArrayList<memPage>();
 		do {		
-			listMemory.add(new MemoryPage(memory,temp[0],temp[1]));
+			for (int j = 0; j < temp.getSize(); j++) {
+				memory.setInformation(temp.getIndexStart(), j, rnd.nextInt(100000));
+			}
+			listMemory.add(temp);
 			temp = memory.getIndexForNewPage();
 		} while (temp!=null);
 		ramdomPages();
 	}
 	public void outLoad(int i) {
-		outLoadPage.add(listMemory.get(i).getInformationOnPage());
-		listMemory.get(i).randomPage(Rand);;
+		int[] tempMemory = new int[listMemory.get(i).getSize()];
+		int startPage = listMemory.get(i).getIndexStart();
+		for (int j = 0; j < tempMemory.length; j++) {
+			tempMemory[j] = memory.getInformation(startPage,j);
+			memory.setInformation(startPage, j, rnd.nextInt(100000));
+		}
+		outLoadPage.add(tempMemory);
 	}
 
 	private void ramdomPages() {
-		for (MemoryPage memoryPage : listMemory) {
-			memoryPage.randomPage(Rand);
+		for (memPage is : listMemory) {
+			int indexStart = is.getIndexStart();
+			for (int i = 0; i < is.getSize(); i++) {
+				memory.setInformation(indexStart, i, rnd.nextInt(100000));
+			}
 		}		
 	}
 	public void work() {
-		Random rnd = new Random();
+		
 		while (true) {
 			for (int i = 0; i < rnd.nextInt(5)+1; i++) {
-				listMemory.get(rnd.nextInt(listMemory.size())).setSignOfAppeal(true);;
+				listMemory.get(rnd.nextInt(listMemory.size())).setNeed(true);;;
 			}
 			for (int i = 0; i < listMemory.size(); i++) {
-				if(listMemory.get(i).getSignOfAppeal()) {
-					listMemory.get(i).setSignOfAppeal(false);
+				if(listMemory.get(i).isNeed()) {
+					listMemory.get(i).setNeed(false);
 				} else {
 					outLoad(i);
 				}
@@ -60,10 +73,10 @@ public class Manager {
 			System.out.println();
 		}		
 	}
-	private void printPages(ArrayList<MemoryPage> list) {
-		for (MemoryPage memoryPage : list) {
-			for (int i : memoryPage.getInformationOnPage()) {
-				System.out.printf("%7d",i);
+	private void printPages(ArrayList<memPage> list) {
+		for (memPage memPage : list) {
+			for (int i = 0; i < memPage.getSize(); i++) {
+				System.out.printf("%7d",memory.getInformation(memPage.getIndexStart(), i));
 			}
 			System.out.println();
 		}

@@ -3,7 +3,7 @@ package lab5OS;
 public class Memory {
 	int [][] memory;
 	int sizeX;
-	int sizeY;
+	int sizeY;	
 	
 	public Memory(int rAM,int sizeList) {
 		sizeX = rAM/sizeList;
@@ -11,10 +11,10 @@ public class Memory {
 		memory = new int[sizeX][sizeY];
 	}
 	
-	public int[] getIndexForNewPage() {
+	public memPage getIndexForNewPage() {
 		for (int i = 0; i < sizeX; i++) {
 			if(memory[i][0]==0) {
-				return new int[] {i,0};
+				return new memPage(i, sizeY);
 			}
 		}
 		return null;
