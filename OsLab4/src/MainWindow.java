@@ -147,8 +147,8 @@ public class MainWindow {
 		btnMove.setEnabled(false);
 		btnMove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-					startUpdateTree(fileManager.getRootFile().getChilds());
 					fileManager.setForMove(null);
+					startUpdateTree(fileManager.getRootFile().getChilds());
 				}
 			});
 		btnMove.setBounds(179, 179, 170, 23);
