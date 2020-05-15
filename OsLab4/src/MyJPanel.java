@@ -10,7 +10,7 @@ public class MyJPanel extends JPanel {
 	private int sizePaintSectors;
 	private int[] place;
 	private int startSelectedFile;
-	private ArrayList<File> files = new ArrayList<File>();
+	private ArrayList<CellTable> tables= new ArrayList<CellTable>();
 	
 	public MyJPanel(int sizeDisc,int sizeSector) {
 		this.sizeDisc = sizeDisc;
@@ -49,7 +49,7 @@ public class MyJPanel extends JPanel {
 	}
 	
 	public int allocateMemoryForFile(File file) {
-		files.add(file);
+		tables.add(new CellTable(file,file.getStartInMem()));
 		int size = file.getSize();
 		int countSectors=size/sizeSector;
 		int startNewFile = -1;
@@ -76,7 +76,12 @@ public class MyJPanel extends JPanel {
 	}
 	
 	public void clearMemory(File file) {
-		files.remove(file);
+		for (CellTable cellTable : tables) {
+			if(file == cellTable.getFile()) {
+				tables.remove(cellTable);
+				break;
+			}
+		}
 		int target = file.getStartInMem();
 		if(place[target]!=-1) {
 			clearMemory(place[target]);
