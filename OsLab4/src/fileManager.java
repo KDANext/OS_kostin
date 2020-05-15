@@ -10,12 +10,12 @@ public class fileManager {
 	private File forMove;
 	private DefaultMutableTreeNode treeFile = new DefaultMutableTreeNode(rootFile);
 	private DefaultMutableTreeNode selectedNodeTree = treeFile;
-	MyJPanel panel;
+	private WorkFizMemory wFizMemory;
 	
-	public fileManager(MyJPanel panel) {
-		this.panel = panel;
+	public fileManager(WorkFizMemory wFizMemory) {
+		this.wFizMemory = wFizMemory;
 		rootFile.setSize(1);
-		panel.allocateMemoryForFile(rootFile);
+		wFizMemory.allocateMemoryForFile(rootFile);
 	}
 
 	public File getRootFile() {
@@ -71,14 +71,6 @@ public class fileManager {
 		this.selected = (File) selectedNodeTree.getUserObject();	
 	}
 
-	public MyJPanel getPanel() {
-		return panel;
-	}
-
-	public void setPanel(MyJPanel panel) {
-		this.panel = panel;
-	}
-
 	public File Copy() {
 		return forCopy = selected;		
 	}
@@ -89,14 +81,13 @@ public class fileManager {
 				File newFile = forCopy.clone();
 				newFile.setParrent(selected);
 				selected.getChilds().add(newFile);
-				panel.allocateMemoryForFile(newFile);
+				wFizMemory.allocateMemoryForFile(newFile);
 				if (newFile.getFolder()) {
 					copyFiles(newFile);
 				}				
 			} catch (CloneNotSupportedException e1) {
 				e1.printStackTrace();
 			}
-			panel.repaint();
 			return true;
 		} else {
 			return false;
@@ -106,7 +97,7 @@ public class fileManager {
 	
 	public void copyFiles(File newFile) {
 		for (File file : newFile.getChilds()) {
-			panel.allocateMemoryForFile(file);
+			wFizMemory.allocateMemoryForFile(file);
 			if(file.getFolder()) {
 				copyFiles(file);
 			}
@@ -114,7 +105,7 @@ public class fileManager {
 	}
 	
 	public void startDelForlder() {
-		panel.clearMemory(selected);
+		wFizMemory.clearMemory(selected);
 		delForder(selected.getChilds());
 	}
 
@@ -123,7 +114,7 @@ public class fileManager {
 			if(file.getFolder()) {
 				delForder(file.getChilds());
 			}
-			panel.clearMemory(file);
+			wFizMemory.clearMemory(file);
 		}
 	}
 	
@@ -135,7 +126,7 @@ public class fileManager {
 			} else {
 				newFile.setSize(fileSize);			
 			}
-			panel.allocateMemoryForFile(newFile);
+			wFizMemory.allocateMemoryForFile(newFile);
 			selected.getChilds().add(newFile);
 			selectedNodeTree.add(new DefaultMutableTreeNode(newFile));
 			return true;
@@ -169,9 +160,8 @@ public class fileManager {
 			if (selected.getFolder()) {
 				startDelForlder();;
 			} else {
-				panel.clearMemory(selected);
+				wFizMemory.clearMemory(selected);
 			}
-			panel.repaint();
 		}
 		return false;
 	}

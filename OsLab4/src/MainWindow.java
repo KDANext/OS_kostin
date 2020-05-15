@@ -40,6 +40,7 @@ public class MainWindow {
 	private JButton btnCreateFile;
 	private JButton btnDelete;
 	MyJPanel panel;
+	WorkFizMemory fizMemory;
 	private fileManager fileManager;
 	private JTextField textFieldSizeFile;
 	private JLabel lblSizeFile;
@@ -74,6 +75,7 @@ public class MainWindow {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 929, 579);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	
+		frame.getContentPane().setLayout(null);
 		txtName = new JTextField();
 		txtName.setEnabled(false);
 		txtName.setHorizontalAlignment(SwingConstants.CENTER);
@@ -201,10 +203,12 @@ public class MainWindow {
 				buttonCreateFolder.setEnabled(true);
 				buttonPaste.setEnabled(true);
 				txtName.setEnabled(true);
-				panel = new MyJPanel(Integer.parseInt(textFieldSizeDisc.getText()),Integer.parseInt(textSizeSector.getText()));
+				fizMemory = new WorkFizMemory(Integer.parseInt(textFieldSizeDisc.getText()),Integer.parseInt(textSizeSector.getText()));
+				fizMemory.setStartSelectedFile(0);
+				panel = new MyJPanel(fizMemory);
 				panel.setBounds(359, 11, 544, 518);
 				frame.getContentPane().add(panel);
-				fileManager= new fileManager(panel);
+				fileManager= new fileManager(fizMemory);
 				panel.repaint();
 				startUpdateTree(fileManager.getRootFile().getChilds());
 			}
@@ -219,7 +223,7 @@ public class MainWindow {
 		textFieldSizeFile.setColumns(10);
 		
 		lblSizeFile = new JLabel("Size File:");
-		lblSizeFile.setBounds(187, 370, 46, 14);
+		lblSizeFile.setBounds(199, 366, 54, 31);
 		frame.getContentPane().add(lblSizeFile);
 	}
 
@@ -238,7 +242,7 @@ public class MainWindow {
 		tree.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent e) {
 				fileManager.setSelectedNodeTree((DefaultMutableTreeNode) tree.getSelectionPath().getLastPathComponent());
-				panel.setStartSelectedFile(fileManager.getSelected().getStartInMem());
+				fizMemory.setStartSelectedFile(fileManager.getSelected().getStartInMem());
 				panel.repaint();
 				System.out.println(fileManager.getSelected());
 			}
