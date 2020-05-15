@@ -130,7 +130,7 @@ public class MainWindow {
 						File newFile = forCopy.clone();
 						newFile.setParrent(selected);
 						selected.getChilds().add(newFile);
-						newFile.setStartInMem(panel.allocateMemoryForFile(newFile.getSize()));
+						panel.allocateMemoryForFile(newFile);
 						if (newFile.getFolder()) {
 							copyFiles(newFile);
 						}
@@ -193,7 +193,7 @@ public class MainWindow {
 					if (selected.getFolder()) {
 						startDelForlder();;
 					} else {
-						panel.clearMemory(selected.getStartInMem());
+						panel.clearMemory(selected);
 					}
 					startUpdateTree(rootFile.getChilds());
 					panel.repaint();
@@ -241,7 +241,7 @@ public class MainWindow {
 				panel = new MyJPanel(Integer.parseInt(textFieldSizeDisc.getText()),Integer.parseInt(textSizeSector.getText()));
 				panel.setBounds(359, 11, 544, 518);
 				frame.getContentPane().add(panel);
-				rootFile.setStartInMem(panel.allocateMemoryForFile(1));
+				panel.allocateMemoryForFile(rootFile);
 				panel.repaint();
 				tree.setEnabled(true);
 			}
@@ -261,7 +261,7 @@ public class MainWindow {
 	}
 	protected void copyFiles(File newFile) {
 		for (File file : newFile.getChilds()) {
-			file.setStartInMem(panel.allocateMemoryForFile(file.getSize()));
+			panel.allocateMemoryForFile(file);
 			if(file.getFolder()) {
 				copyFiles(file);
 			}
@@ -269,7 +269,7 @@ public class MainWindow {
 	}
 
 	private void startDelForlder() {
-		panel.clearMemory(selected.getStartInMem());
+		panel.clearMemory(selected);
 		delForder(selected.getChilds());
 	}
 
@@ -278,7 +278,7 @@ public class MainWindow {
 			if(file.getFolder()) {
 				delForder(file.getChilds());
 			}
-			panel.clearMemory(file.getStartInMem());
+			panel.clearMemory(file);
 		}
 	}
 
@@ -325,7 +325,7 @@ public class MainWindow {
 			} else {
 				newFile.setSize(Integer.parseInt(textFieldSizeFile.getText()));			
 			}
-			newFile.setStartInMem(panel.allocateMemoryForFile(newFile.getSize()));
+			panel.allocateMemoryForFile(newFile);
 			selected.getChilds().add(newFile);
 			selectedNodeTree.add(new DefaultMutableTreeNode(newFile));
 			startUpdateTree(rootFile.getChilds());

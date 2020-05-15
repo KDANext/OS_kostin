@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
@@ -9,6 +10,7 @@ public class MyJPanel extends JPanel {
 	private int sizePaintSectors;
 	private int[] place;
 	private int startSelectedFile;
+	private ArrayList<File> files = new ArrayList<File>();
 	
 	public MyJPanel(int sizeDisc,int sizeSector) {
 		this.sizeDisc = sizeDisc;
@@ -46,7 +48,9 @@ public class MyJPanel extends JPanel {
 		}		
 	}
 	
-	public int allocateMemoryForFile(int size) {
+	public int allocateMemoryForFile(File file) {
+		files.add(file);
+		int size = file.getSize();
 		int countSectors=size/sizeSector;
 		int startNewFile = -1;
 		int prevSector = 0;
@@ -58,6 +62,7 @@ public class MyJPanel extends JPanel {
 				startNewFile = i;
 				prevSector = i;	
 				countSectors--;
+				file.setStartInMem(startNewFile);
 			} else if (place[i]==0) {
 				place[prevSector]=i;
 				prevSector = i;
@@ -70,12 +75,21 @@ public class MyJPanel extends JPanel {
 		return startNewFile;	
 	}
 	
-	public void clearMemory(int target) {
+	public void clearMemory(File file) {
+		files.remove(file);
+		int target = file.getStartInMem();
 		if(place[target]!=-1) {
 			clearMemory(place[target]);
 		}
 		place[target] = 0;
 		startSelectedFile = -1;
+	}
+
+	private void clearMemory(int i) {
+		if(place[i]!=-1) {
+			clearMemory(place[i]);
+		}
+		place[i] = 0;
 	}
 
 	public int getStartSelectedFile() {
