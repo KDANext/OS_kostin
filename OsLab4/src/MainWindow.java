@@ -30,12 +30,6 @@ public class MainWindow {
 	private JFrame frame;
 	private JTextField txtName;
 	private JTree tree;
-	private File rootFile = new File("root",null,true);
-	private File selected = rootFile;
-	private File forCopy;
-	private File forMove;
-	private DefaultMutableTreeNode treeFile = new DefaultMutableTreeNode(rootFile);
-	private DefaultMutableTreeNode selectedNodeTree = treeFile;
 	private JTextField textConsol;
 	private JTextField textFieldSizeDisc;
 	private JTextField textSizeSector;
@@ -46,8 +40,10 @@ public class MainWindow {
 	private JButton btnCreateFile;
 	private JButton btnDelete;
 	MyJPanel panel;
+	private fileManager fileManager;
 	private JTextField textFieldSizeFile;
 	private JLabel lblSizeFile;
+	private DefaultMutableTreeNode treeFile;
 	/**
 	 * Launch the application.
 	 */
@@ -77,10 +73,7 @@ public class MainWindow {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setBounds(100, 100, 929, 579);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		rootFile.setSize(1);
-		startUpdateTree(rootFile.getChilds());
-		
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	
 		txtName = new JTextField();
 		txtName.setEnabled(false);
 		txtName.setHorizontalAlignment(SwingConstants.CENTER);
@@ -98,7 +91,10 @@ public class MainWindow {
 		buttonCreateFolder.setEnabled(false);
 		buttonCreateFolder.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				CreateNewFile(true);
+				fileManager.CreateNewFile(true,txtName.getText(),Integer.parseInt(textFieldSizeFile.getText()));
+				startUpdateTree(fileManager.getRootFile().getChilds());
+				textConsol.setText("Create");
+				panel.repaint();
 			}
 		});
 		buttonCreateFolder.setBounds(184, 68, 165, 23);
@@ -114,8 +110,7 @@ public class MainWindow {
 		buttonCopy.setEnabled(false);
 		buttonCopy.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				forCopy = selected;
-				textConsol.setText("Copy: "+forCopy);
+				textConsol.setText("Copy: "+fileManager.Copy());
 			}
 		});
 		buttonCopy.setBounds(184, 110, 165, 23);
@@ -125,24 +120,10 @@ public class MainWindow {
 		buttonPaste.setEnabled(false);
 		buttonPaste.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(selected.getFolder()) {
-					try {
-						File newFile = forCopy.clone();
-						newFile.setParrent(selected);
-						selected.getChilds().add(newFile);
-						panel.allocateMemoryForFile(newFile);
-						if (newFile.getFolder()) {
-							copyFiles(newFile);
-						}
-						startUpdateTree(rootFile.getChilds());
-						textConsol.setText("Complete paste");
-					} catch (CloneNotSupportedException e1) {
-						e1.printStackTrace();
-					}
+					fileManager.paste();
+					startUpdateTree(fileManager.getRootFile().getChilds());
+					textConsol.setText("Complete paste");
 					panel.repaint();
-				} else {
-					textConsol.setText("Select no folder");
-				}
 			}
 		});
 		buttonPaste.setBounds(184, 144, 165, 23);
@@ -153,7 +134,10 @@ public class MainWindow {
 		btnCreateFile.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				CreateNewFile(false);
+				fileManager.CreateNewFile(false,txtName.getText(),Integer.parseInt(textFieldSizeFile.getText()));
+				startUpdateTree(fileManager.getRootFile().getChilds());
+				textConsol.setText("Create");
+				panel.repaint();
 			}
 		});
 		btnCreateFile.setBounds(184, 42, 165, 23);
@@ -163,22 +147,10 @@ public class MainWindow {
 		btnMove.setEnabled(false);
 		btnMove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(Objects.isNull(forMove)) {
-					forMove = selected;
-					textConsol.setText("choice new folder");
-				} else {
-					if(selected.getFolder()) {
-						forMove.getParrent().getChilds().remove(forMove);
-						forMove.setParrent(selected);
-						forMove.getParrent().getChilds().add(forMove);
-						startUpdateTree(rootFile.getChilds());
-						forMove = null;
-					} else {
-						textConsol.setText("Select no folder");
-					}
+					startUpdateTree(fileManager.getRootFile().getChilds());
+					fileManager.setForMove(null);
 				}
-			}
-		});
+			});
 		btnMove.setBounds(179, 179, 170, 23);
 		frame.getContentPane().add(btnMove);
 		
@@ -186,18 +158,9 @@ public class MainWindow {
 		btnDelete.setEnabled(false);
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(selected == rootFile) {
-					textConsol.setText("impossible");
-				} else {
-					selected.getParrent().getChilds().remove(selected);
-					if (selected.getFolder()) {
-						startDelForlder();;
-					} else {
-						panel.clearMemory(selected);
-					}
-					startUpdateTree(rootFile.getChilds());
+					fileManager.delete();
+					startUpdateTree(fileManager.getRootFile().getChilds());
 					panel.repaint();
-				}
 			}
 		});
 		btnDelete.setBounds(189, 213, 160, 23);
@@ -241,9 +204,9 @@ public class MainWindow {
 				panel = new MyJPanel(Integer.parseInt(textFieldSizeDisc.getText()),Integer.parseInt(textSizeSector.getText()));
 				panel.setBounds(359, 11, 544, 518);
 				frame.getContentPane().add(panel);
-				panel.allocateMemoryForFile(rootFile);
+				fileManager= new fileManager(panel);
 				panel.repaint();
-				tree.setEnabled(true);
+				startUpdateTree(fileManager.getRootFile().getChilds());
 			}
 		});
 		btnGenerateDisc.setBounds(179, 336, 170, 23);
@@ -259,31 +222,11 @@ public class MainWindow {
 		lblSizeFile.setBounds(187, 370, 46, 14);
 		frame.getContentPane().add(lblSizeFile);
 	}
-	protected void copyFiles(File newFile) {
-		for (File file : newFile.getChilds()) {
-			panel.allocateMemoryForFile(file);
-			if(file.getFolder()) {
-				copyFiles(file);
-			}
-		}
-	}
 
-	private void startDelForlder() {
-		panel.clearMemory(selected);
-		delForder(selected.getChilds());
-	}
-
-	protected void delForder(ArrayList<File> files) {
-		for (File file : files) {
-			if(file.getFolder()) {
-				delForder(file.getChilds());
-			}
-			panel.clearMemory(file);
-		}
-	}
+	
 
 	protected void startUpdateTree(ArrayList<File> childs) {
-		treeFile = new DefaultMutableTreeNode(rootFile);
+		treeFile = new DefaultMutableTreeNode(fileManager.getRootFile());
 		updateTree(treeFile,childs);
 		if(!Objects.isNull(tree)) {
 			frame.getContentPane().remove(tree);
@@ -294,11 +237,10 @@ public class MainWindow {
 		tree.setBounds(0, 0, 169, 529);
 		tree.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent e) {
-				selectedNodeTree = (DefaultMutableTreeNode) tree.getSelectionPath().getLastPathComponent();
-				selected =(File) selectedNodeTree.getUserObject();
-				panel.setStartSelectedFile(selected.getStartInMem());
+				fileManager.setSelectedNodeTree((DefaultMutableTreeNode) tree.getSelectionPath().getLastPathComponent());
+				panel.setStartSelectedFile(fileManager.getSelected().getStartInMem());
 				panel.repaint();
-				System.out.println(selected);
+				System.out.println(fileManager.getSelected());
 			}
 		});
 		frame.getContentPane().setLayout(null);
@@ -317,22 +259,4 @@ public class MainWindow {
 		}		
 	}
 
-	protected void CreateNewFile(boolean b) {
-		if(selected.getFolder()) {
-			File newFile = new File(txtName.getText()+"",selected,b);	
-			if(b) {
-				newFile.setSize(1);
-			} else {
-				newFile.setSize(Integer.parseInt(textFieldSizeFile.getText()));			
-			}
-			panel.allocateMemoryForFile(newFile);
-			selected.getChilds().add(newFile);
-			selectedNodeTree.add(new DefaultMutableTreeNode(newFile));
-			startUpdateTree(rootFile.getChilds());
-			textConsol.setText("Create "+b+" "+newFile);
-		} else {
-			textConsol.setText("Select no folder");
-		}
-		panel.repaint();
-	}
 }

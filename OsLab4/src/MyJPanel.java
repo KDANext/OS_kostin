@@ -76,6 +76,7 @@ public class MyJPanel extends JPanel {
 	}
 	
 	public void clearMemory(File file) {
+		
 		for (CellTable cellTable : tables) {
 			if(file == cellTable.getFile()) {
 				tables.remove(cellTable);
