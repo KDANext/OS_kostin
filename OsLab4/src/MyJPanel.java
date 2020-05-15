@@ -8,16 +8,17 @@ public class MyJPanel extends JPanel {
 	private int sizeDisc;
 	private int sizeSector;
 	private int sizePaintSectors;
-	private int[] place;
+	private CellTable[] place;
 	private int startSelectedFile;
-	private ArrayList<CellTable> tables= new ArrayList<CellTable>();
 	
 	public MyJPanel(int sizeDisc,int sizeSector) {
 		this.sizeDisc = sizeDisc;
 		this.sizeSector = sizeSector;
 		this.sizePaintSectors = (int) Math.sqrt(Double.parseDouble(sizeDisc/sizeSector+""));
-		place = new int[sizeDisc/sizeSector];
-		
+		place = new CellTable[sizeDisc/sizeSector];
+		for (int i = 0; i < place.length; i++) {
+			place[i] = new CellTable(null, 0);
+		}
 	}
 	
 	@Override
@@ -34,9 +35,9 @@ public class MyJPanel extends JPanel {
 				y+=sizeY;
 			}
 			if(i==nextSelectSector) {
-				nextSelectSector = place[i];
+				nextSelectSector = place[i].getNextCell();
 				g.setColor(Color.red);
-			} else if(place[i]==0) {
+			} else if(place[i].getNextCell()==0) {
 				g.setColor(Color.gray);
 			} else {
 				g.setColor(Color.blue);
@@ -49,7 +50,6 @@ public class MyJPanel extends JPanel {
 	}
 	
 	public int allocateMemoryForFile(File file) {
-		tables.add(new CellTable(file,file.getStartInMem()));
 		int size = file.getSize();
 		int countSectors=size/sizeSector;
 		int startNewFile = -1;
@@ -57,16 +57,18 @@ public class MyJPanel extends JPanel {
 		if(size%sizeSector>0)
 			countSectors++;
 		for (int i = 0; i < place.length; i++) {
-			if(place[i]==0 && startNewFile == -1) {
-				place[i] = -1;
+			if(place[i].getNextCell()==0 && startNewFile == -1) {
+				place[i].setNextCell(-1);
+				place[i].setFile(file);
 				startNewFile = i;
 				prevSector = i;	
 				countSectors--;
 				file.setStartInMem(startNewFile);
-			} else if (place[i]==0) {
-				place[prevSector]=i;
+			} else if (place[i].getNextCell()==0) {
+				place[prevSector].setNextCell(i);
+				place[i].setFile(file);
 				prevSector = i;
-				place[i]=-1;
+				place[i].setNextCell(-1);
 				countSectors--;
 			}
 			if (countSectors==0)
@@ -76,25 +78,20 @@ public class MyJPanel extends JPanel {
 	}
 	
 	public void clearMemory(File file) {
-		for (CellTable cellTable : tables) {
-			if(file == cellTable.getFile()) {
-				tables.remove(cellTable);
-				break;
-			}
-		}
 		int target = file.getStartInMem();
-		if(place[target]!=-1) {
-			clearMemory(place[target]);
+		if(place[target].getNextCell()!=-1) {
+			clearMemory(place[place[target].getNextCell()]);
 		}
-		place[target] = 0;
+		place[target].setNextCell(0);
 		startSelectedFile = -1;
 	}
 
-	private void clearMemory(int i) {
-		if(place[i]!=-1) {
-			clearMemory(place[i]);
+	private void clearMemory(CellTable cellTable) {
+		if(cellTable.getNextCell()!=-1) {
+			clearMemory(place[cellTable.getNextCell()]);
 		}
-		place[i] = 0;
+		cellTable.setNextCell(0);
+		cellTable.setFile(null);
 	}
 
 	public int getStartSelectedFile() {
