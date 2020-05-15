@@ -1,11 +1,11 @@
 
 public class CellTable {
 	private File file;
-	private int nextCell;
+	private int startFile;
 	
 	public CellTable(File file, int startInMem) {
 		this.file = file;
-		this.nextCell = startInMem;
+		this.startFile = startInMem;
 	}
 
 	public File getFile() {
@@ -16,11 +16,11 @@ public class CellTable {
 		this.file = file;
 	}
 
-	public int getNextCell() {
-		return nextCell;
+	public int getStartFile() {
+		return startFile;
 	}
 
-	public void setNextCell(int startFile) {
-		this.nextCell = startFile;
+	public void setStartFile(int startFile) {
+		this.startFile = startFile;
 	}
 }
